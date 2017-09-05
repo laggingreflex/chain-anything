@@ -1,0 +1,14 @@
+{
+  "name": "chain-anything",
+  "version": "0.0.0",
+  "description": "A minimal chaining library using ES Proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": "laggingreflex/chain-anything",
+  "devDependencies": {
+    "mocha": "^3.5.0",
+    "testdouble": "^3.2.4"
+  }
+}
