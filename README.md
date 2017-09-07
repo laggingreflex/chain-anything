@@ -1,6 +1,11 @@
 # chain-anything
 
-A minimal chaining library using ES Proxy.
+A chaining library that uses [ES Proxy].
+
+<small>**Use only where [ES6 proxy is available][proxy-support].** </small>
+
+[ES Proxy]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+[proxy-support]: http://caniuse.com/proxy
 
 ## Install
 

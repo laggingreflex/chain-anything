@@ -1,7 +1,7 @@
 {
   "name": "chain-anything",
   "version": "0.0.0",
-  "description": "A minimal chaining library using ES Proxy",
+  "description": "Chaining library using ES Proxy",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
