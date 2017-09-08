@@ -1,71 +1,54 @@
 const noop = () => {};
 
-const symbol = {
-  apply: Symbol('apply'),
-  get: Symbol('get'),
-};
-
-const $_ = {
-  // private
-  opts: Symbol('opts'),
-  handler: Symbol('handler'),
-  source: Symbol('source'),
-  proxyHandler: Symbol('proxyHandler'),
-};
-
-class main {
-  constructor(handler, opts = {}) {
-    const $ = this.constructor.symbol; // public static
-    this[$_.opts] = opts;
-    this[$_.handler] = handler;
-    if (!this[$_.handler]) {
-      throw new Error('Need a handler');
+module.exports = (all, keys, opts) => {
+  if (!opts) {
+    opts = {};
+    if (!keys) {
+      if (typeof all !== 'function') {
+        keys = all;
+        all = noop;
+      }
     }
-    if (typeof this[$_.handler] === 'function') {
-      this[$_.handler] = {
-        [$.apply]: this[$_.handler],
-        [$.get]: this[$_.handler]
-      };
-    }
-    this[$_.handler][$.apply] = this[$_.handler][$.apply] || noop;
-    this[$_.handler][$.get] = this[$_.handler][$.get] || noop;
-    this[$_.source] = function(...args) { return this[$_.handler][$.apply](this[$_.source], this, args) };
-    this[$_.proxyHandler] = {};
-    this[$_.proxyHandler].apply = (target, thisArg, args) => {
-      const ret = this[$_.handler][$.apply].apply(recurse, args);
-      if (ret === undefined && this[$_.opts].resumeChainOnUndefined !== false) {
-        return recurse;
-      } else {
-        return ret;
-      }
-    };
-    this[$_.proxyHandler].get = (target, prop, recv) => {
-      let ret;
-      if (prop in this[$_.handler]) {
-        ret = this[$_.handler][prop].call(recurse);
-      } else {
-        ret = this[$_.handler][$.get].call(recurse, prop);
-      }
-      if (ret === undefined && opts.resumeChainOnUndefined !== false) {
-        return recurse;
-      } else if (typeof ret === 'function') {
-        return function(...args) {
-          const retRet = ret.apply(this, args);
-          if (retRet === undefined && opts.resumeChainOnUndefined !== false) {
-            return recurse;
-          } else {
-            return retRet;
-          }
-        }
-      } else {
-        return ret;
-      }
-    };
-    const recurse = new Proxy(this[$_.source], this[$_.proxyHandler]);
-    return recurse;
   }
-}
 
-main.symbol = symbol
+  if (typeof all !== 'function') {
+    throw new Error('Invalid arguments: all needs to be a function');
+  }
+  if (!keys) {
+    throw new Error('Invalid arguments: keys need to be an object');
+  }
+  if (!opts) {
+    throw new Error('Invalid arguments: opts need to be an object');
+  }
 
-module.exports = main;
+  let proxy;
+
+  const get = (t, prop) => {
+    let result;
+    if (prop in keys) {
+      result = keys[prop].call(proxy);
+    } else {
+      result = all.call(proxy, prop);
+    }
+    if (result !== undefined && typeof result !== 'function') {
+      return result;
+    } else if (typeof result === 'function') {
+      const fn = result;
+      const returnFn = (...args) => {
+        const result = fn.call(proxy, ...args);
+        if (result !== undefined) {
+          return result;
+        } else {
+          return proxy;
+        }
+      }
+      return new Proxy(returnFn, { get });
+    } else {
+      return proxy;
+    }
+  };
+
+  proxy = new Proxy({}, { get });
+
+  return proxy;
+};
