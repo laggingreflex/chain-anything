@@ -4,6 +4,7 @@ module.exports = (all, keys, opts) => {
   if (!opts) {
     opts = {};
     if (!keys) {
+      keys = {};
       if (typeof all !== 'function') {
         keys = all;
         all = noop;

@@ -1,9 +1,12 @@
-const chain = require('..');
+const chain = require('.');
 const td = require('testdouble');
 const assert = require('assert');
 
 describe.only('basic', () => {
-  it('basic', () => {
+  it('allOK', done => chain(ok => done(assert.equal(ok, 'ok'))).ok);
+  it('customOK', done => chain({ done }).done);
+
+  it('full', () => {
     const all = td.function();
     const allFn = td.function();
     const custom = td.function();
