@@ -3,45 +3,48 @@ const noop = () => {};
 const symbol = {
   apply: Symbol('apply'),
   get: Symbol('get'),
-  opts: Symbol('opts'),
 };
 
-const $ = {
+const $_ = {
+  // private
   opts: Symbol('opts'),
   handler: Symbol('handler'),
+  source: Symbol('source'),
+  proxyHandler: Symbol('proxyHandler'),
 };
 
 class main {
   constructor(handler, opts = {}) {
-    this[$.opts] = opts;
-    this[$.handler] = handler;
-    if (!this[$.handler]) {
+    const $ = this.constructor.symbol; // public static
+    this[$_.opts] = opts;
+    this[$_.handler] = handler;
+    if (!this[$_.handler]) {
       throw new Error('Need a handler');
     }
-    if (typeof this[$.handler] === 'function') {
-      this[$.handler] = {
-        [symbol.apply]: this[$.handler],
-        [symbol.get]: this[$.handler]
+    if (typeof this[$_.handler] === 'function') {
+      this[$_.handler] = {
+        [$.apply]: this[$_.handler],
+        [$.get]: this[$_.handler]
       };
     }
-    this[$.handler][symbol.apply] = this[$.handler][symbol.apply] || noop;
-    this[$.handler][symbol.get] = this[$.handler][symbol.get] || noop;
-    const source = function(...args) { return this[$.handler][symbol.apply](source, this, args) };
-    const proxyHandler = {};
-    proxyHandler.apply = (target, thisArg, args) => {
-      const ret = this[$.handler][symbol.apply].apply(recurse, args);
-      if (ret === undefined && this[$.opts].resumeChainOnUndefined !== false) {
+    this[$_.handler][$.apply] = this[$_.handler][$.apply] || noop;
+    this[$_.handler][$.get] = this[$_.handler][$.get] || noop;
+    this[$_.source] = function(...args) { return this[$_.handler][$.apply](this[$_.source], this, args) };
+    this[$_.proxyHandler] = {};
+    this[$_.proxyHandler].apply = (target, thisArg, args) => {
+      const ret = this[$_.handler][$.apply].apply(recurse, args);
+      if (ret === undefined && this[$_.opts].resumeChainOnUndefined !== false) {
         return recurse;
       } else {
         return ret;
       }
     };
-    proxyHandler.get = (target, prop, recv) => {
+    this[$_.proxyHandler].get = (target, prop, recv) => {
       let ret;
-      if (prop in this[$.handler]) {
-        ret = this[$.handler][prop].call(recurse);
+      if (prop in this[$_.handler]) {
+        ret = this[$_.handler][prop].call(recurse);
       } else {
-        ret = this[$.handler][symbol.get].call(recurse, prop);
+        ret = this[$_.handler][$.get].call(recurse, prop);
       }
       if (ret === undefined && opts.resumeChainOnUndefined !== false) {
         return recurse;
@@ -58,7 +61,7 @@ class main {
         return ret;
       }
     };
-    const recurse = new Proxy(source, proxyHandler);
+    const recurse = new Proxy(this[$_.source], this[$_.proxyHandler]);
     return recurse;
   }
 }
