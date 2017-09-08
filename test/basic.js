@@ -1,10 +1,4 @@
-const chain = require('.');
-const td = require('testdouble');
-const assert = require('assert');
-
-const any = td.matchers.anything;
-
-describe('test', () => {
+describe('basic', () => {
   it('basic', () => {
     const apply = td.function();
     const get = td.function();
