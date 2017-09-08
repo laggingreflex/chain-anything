@@ -7,7 +7,7 @@ describe('basic', () => {
 
     td.when(g()).thenReturn(h);
 
-    const chained = chain({
+    const chained = new chain({
       [chain.symbol.apply]: apply,
       [chain.symbol.get]: get,
       g
@@ -26,7 +26,7 @@ describe('basic', () => {
 
   it('custom function', (done) => {
     const custom = td.function();
-    const chained = chain({
+    const chained = new chain({
       custom: () => text => done(assert.equal(text, 'haha'))
     });
     chained.custom('haha');
@@ -35,19 +35,19 @@ describe('basic', () => {
     assert.throws(chain)
   });
   it('single function arg', (done) => {
-    const chained = chain(done)
+    const chained = new chain(done)
     chained();
   });
   it('ends by returning a value', () => {
-    const chained = chain(i => i)
+    const chained = new chain(i => i)
     assert.equal(chained(1), 1)
   });
   it('ends by returning a value from a key', () => {
-    const chained = chain({ a: () => 1 });
+    const chained = new chain({ a: () => 1 });
     assert.equal(chained.a, 1);
   });
   it('ends by returning a value from a chained function', () => {
-    const chained = chain({ a: () => i => i });
+    const chained = new chain({ a: () => i => i });
     assert.equal(chained.a(1), 1);
   });
 });
