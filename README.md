@@ -1,4 +1,4 @@
-# chain-anything
+# chain-free
 
 A chaining library that uses [ES Proxy].
 
@@ -10,13 +10,13 @@ A chaining library that uses [ES Proxy].
 ## Install
 
 ```sh
-npm install chain-anything
+npm install chain-free
 ```
 
 ## Usage
 
 ```js
-const chain = require('chain-anything');
+const chain = require('chain-free');
 const handler = {
   // use special symbols provided by the library
   [chain.symbol.apply] (...args) {

@@ -1,12 +1,12 @@
 {
-  "name": "chain-anything",
+  "name": "chain-free",
   "version": "0.0.0",
   "description": "Chaining library using ES Proxy",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "repository": "laggingreflex/chain-anything",
+  "repository": "laggingreflex/chain-free",
   "devDependencies": {
     "mocha": "^3.5.0",
     "testdouble": "^3.2.4"
