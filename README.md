@@ -1,8 +1,8 @@
 # chain-free
 
-A chaining library that uses [ES Proxy].
+Create chains with any arbitrary properties.
 
-<small>**Use only where [ES6 proxy is available][proxy-support].** </small>
+<small>**Uses [ES Proxy], use only where [available][proxy-support].** </small>
 
 [ES Proxy]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy
 [proxy-support]: http://caniuse.com/proxy
@@ -16,38 +16,47 @@ npm install chain-free
 ## Usage
 
 ```js
-const chain = require('chain-free');
-const handler = {
-  // use special symbols provided by the library
-  [chain.symbol.apply] (...args) {
-    // called whenever a function is called
-    console.log('apply:', ...args);
-  },
-  [chain.symbol.get] (key) {
-    // called whenever a property key is accessed
-    console.log('get:', key);
-  },
-  // or use any custom properties
-  custom () {
-    // called whenever a `.custom` property is accessed
-    // you may return a function here for it to be treated as such
-    return (...args) => {
-      // called whenever a `.custom()` function is called
+const chain = require('chain-free')
+const all = (key) => {...}
+const custom = {...} // optional
+const chained = chain(all, custom)
+```
+
+```js
+const chained = chain(key => {
+  // called on all property lookups
+  console.log('Property accessed:', key)
+  // you may return a function here for it to be treated as such
+  return () => {
+    console.log(`chained.${key}() called`)
+    if (done) {
       // The chain ends when you return something
-      return 'end';
+      return 'done'
+      // (either from this child function or the parent property lookup)
     }
   }
-}
-const chained = chain(handler)
+}, {
+  // custom functions called when accessed property name matches:
+  customKey: () => {
+    console.log('"customKey" property accessed')
+  },
+  customFn: () => () => { // <- return function from property
+    console.log('"customFn" called')
+    return 'result'
+  },
+})
 
-const result = chained('a').b('c').d.e.custom();
-console.log('result = ', result);
+const result = chained.a.b('c').d.e.customKey.customFn()
+console.log('result = ', result)
+```
 ```
 <blockquote><pre>
-apply: a
-get: b
-apply: c
-get: d
-get: e
-result = end
+Property accessed: a
+Property accessed: b
+chained.b() called
+Property accessed: d
+Property accessed: e
+"customKey" property accessed
+"customFn" called
+result =  result
 </pre></blockquote>
