@@ -24,12 +24,12 @@ module.exports = (all, keys, opts) => {
 
   let proxy;
 
-  const get = (t, prop) => {
+  const get = (t, prop, ...prev) => {
     let result;
     if (prop in keys) {
-      result = keys[prop].call(proxy);
+      result = keys[prop].call(proxy, ...prev);
     } else {
-      result = all.call(proxy, prop);
+      result = all.call(proxy, prop, ...prev);
     }
     if (result !== undefined && typeof result !== 'function') {
       return result;
@@ -40,16 +40,23 @@ module.exports = (all, keys, opts) => {
         if (result !== undefined) {
           return result;
         } else {
-          return proxy;
+          return new Proxy({}, {
+            get: (t, latestProp) => get(t, latestProp, prop, ...prev)
+          });
+
         }
       }
-      return new Proxy(returnFn, { get });
+      return new Proxy(returnFn, {
+        get: (t, latestProp) => get(t, latestProp, prop, ...prev)
+      });
     } else {
-      return proxy;
+      return new Proxy({}, {
+        get: (t, latestProp) => get(t, latestProp, prop, ...prev)
+      });
     }
   };
 
-  proxy = new Proxy({}, { get });
+  proxy = new Proxy({}, { get: (t, prop) => get(t, prop) });
 
   return proxy;
 };
