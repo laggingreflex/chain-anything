@@ -10,19 +10,13 @@ describe('full', () => {
   it(`chain.a.b('c').d.e('f').g.custom('h').i('j').k`, () => {
     const all = [];
     const custom = [];
-    const chained = chain((...args) => {
-      all.push(args);
+    const handle = handler => (...args) => {
+      eval(handler).push(args);
       return (...args) => {
-        all.push(args);
-      };
-    }, {
-      custom: (...args) => {
-        custom.push(args);
-        return (...args) => {
-          custom.push(args);
-        };
+        eval(handler).push(args);
       }
-    });
+    }
+    const chained = chain(handle('all'), { custom: handle('custom') });
 
     chained.a.b('c').d.e('f').g.custom('h').i('j').k;
 

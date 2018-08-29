@@ -22,6 +22,10 @@ module.exports = (all, keys, opts) => {
     throw new Error('Invalid arguments: opts need to be an object');
   }
 
+  const createProxy = (from, ...prev) => new Proxy(from, {
+    get: (t, prop) => get(t, prop, ...prev)
+  });
+
   let proxy;
 
   const get = (t, prop, ...prev) => {
@@ -40,23 +44,16 @@ module.exports = (all, keys, opts) => {
         if (result !== undefined) {
           return result;
         } else {
-          return new Proxy({}, {
-            get: (t, latestProp) => get(t, latestProp, prop, ...prev)
-          });
-
+          return createProxy({}, prop, ...prev)
         }
       }
-      return new Proxy(returnFn, {
-        get: (t, latestProp) => get(t, latestProp, prop, ...prev)
-      });
+      return createProxy(returnFn, prop, ...prev)
     } else {
-      return new Proxy({}, {
-        get: (t, latestProp) => get(t, latestProp, prop, ...prev)
-      });
+      return createProxy({}, prop, ...prev)
     }
   };
 
-  proxy = new Proxy({}, { get: (t, prop) => get(t, prop) });
+  proxy = createProxy({});
 
   return proxy;
 };
