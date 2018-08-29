@@ -1,33 +1,47 @@
 const chain = require('.');
-const td = require('testdouble');
 const assert = require('assert');
 
-describe.only('basic', () => {
-  it('allOK', done => chain(ok => done(assert.equal(ok, 'ok'))).ok);
-  it('customOK', done => chain({ done }).done);
+describe('basic', () => {
+  it('all', done => chain(ok => done(assert.equal(ok, 'ok'))).ok);
+  it('custom', done => chain({ done: () => done() }).done);
+});
 
-  it('full', () => {
-    const all = td.function();
-    const allFn = td.function();
-    const custom = td.function();
-    const customFn = td.function();
+describe('full', () => {
+  it(`chain.a.b('c').d.e('f').g.custom('h').i('j').k`, () => {
+    const all = [];
+    const custom = [];
+    const chained = chain((...args) => {
+      all.push(args);
+      return (...args) => {
+        all.push(args);
+      };
+    }, {
+      custom: (...args) => {
+        custom.push(args);
+        return (...args) => {
+          custom.push(args);
+        };
+      }
+    });
 
-    td.when(all(td.matchers.anything())).thenReturn(allFn);
-    td.when(custom()).thenReturn(customFn);
+    chained.a.b('c').d.e('f').g.custom('h').i('j').k;
 
-    const chained = chain(all, { custom });
+    assert.deepEqual(all, [
+      ['a'],
+      ['b', 'a'],
+      ['c'],
+      ['d', 'b', 'a'],
+      ['e', 'd', 'b', 'a'],
+      ['f'],
+      ['g', 'e', 'd', 'b', 'a'],
+      ['i', 'custom', 'g', 'e', 'd', 'b', 'a'],
+      ['j'],
+      ['k', 'i', 'custom', 'g', 'e', 'd', 'b', 'a'],
+    ]);
 
-    // chained.a;
-    chained.a.b('c').d.e('f').g.custom('h');
-
-    // td.verify(all('a'));
-    // td.verify(all('b'));
-    td.verify(allFn('c'));
-    // td.verify(all('d'));
-    // td.verify(all('e'));
-    td.verify(allFn('f'));
-    // td.verify(all('g'));
-    // td.verify(custom());
-    td.verify(customFn('h'));
+    assert.deepEqual(custom, [
+      ['g', 'e', 'd', 'b', 'a'],
+      ['h'],
+    ]);
   });
 });
