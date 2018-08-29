@@ -52,12 +52,20 @@ describe('full', () => {
       ['h'],
     ]);
   });
+  it('keyChain', done => {
+    const chained = chain({
+      'key.chain.a': (...args) => {
+        // assert.deepEqual(args, )
+        done();
+      }
+    });
+    chained.key.chain.a
+  });
 });
 
 describe('misc', () => {
   it('class', () => {
     const chained = chain(() => {}, {}, { base: class {} });
-
     new chained();
   });
 })

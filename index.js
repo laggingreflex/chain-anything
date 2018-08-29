@@ -39,8 +39,11 @@ module.exports = (all, keys, opts) => {
 
   const get = (prop, ...prev) => {
     let result;
+    let keyChain = typeof prop === 'string' && !prev.find(p => typeof prop !== 'string') ? [prop, ...prev].reverse().join('.') : null;
     if (prop in keys) {
       result = keys[prop].call(proxy, ...prev);
+    } else if (keyChain && keyChain in keys) {
+      result = keys[keyChain].call(proxy, ...prev);
     } else {
       result = all.call(proxy, prop, ...prev);
     }
