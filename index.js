@@ -23,12 +23,12 @@ module.exports = (all, keys, opts) => {
   }
 
   const createProxy = (from, ...prev) => new Proxy(from, {
-    get: (t, prop) => get(t, prop, ...prev)
+    get: (t, prop) => get(prop, ...prev),
   });
 
   let proxy;
 
-  const get = (t, prop, ...prev) => {
+  const get = (prop, ...prev) => {
     let result;
     if (prop in keys) {
       result = keys[prop].call(proxy, ...prev);
