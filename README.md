@@ -15,12 +15,25 @@ npm install chain-free
 
 ## Usage
 
+### API
+
 ```js
-const chain = require('chain-free')
-const all = (key) => {...}
-const custom = {...} // optional
-const chained = chain(all, custom)
+chain(all, {...custom}, {...opts})
 ```
+
+* **`all`** `function` that gets called on every property access with all previous properties as args in latest-to-oldest order.
+
+* **`{...custom}`** `object` whose keys (`function`) get called whenever that key is accessed.
+
+
+* **`opts.base`** Base to use for proxy.
+
+* **`opts.inherit`** `[default:true]` Whether to inherit existing  properties.
+
+
+
+
+### Example
 
 ```js
 const chained = chain(key => {
@@ -39,18 +52,19 @@ const chained = chain(key => {
   // custom functions called when accessed property name matches:
   customKey: () => {
     console.log('"customKey" property accessed')
+    // don't try to call `.customKey()` (that's next)
   },
-  customFn: () => () => { // <- return function from property
+  customFn: () => () => {
+               // ^ return function from property
     console.log('"customFn" called')
     return 'result'
   },
 })
 
 const result = chained.a.b('c').d.e.customKey.customFn()
-console.log('result = ', result)
+console.log('result =', result)
 ```
 ```
-<blockquote><pre>
 Property accessed: a
 Property accessed: b
 chained.b() called
@@ -58,5 +72,5 @@ Property accessed: d
 Property accessed: e
 "customKey" property accessed
 "customFn" called
-result =  result
-</pre></blockquote>
+result = result
+```
