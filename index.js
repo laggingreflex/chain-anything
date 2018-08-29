@@ -42,15 +42,15 @@ module.exports = (all, keys, opts) => {
     },
   });
 
+  const findKey = utils.findKey(keys);
+
   let proxy;
 
   const get = (prop, ...prev) => {
     let result;
-    let keyChain = typeof prop === 'string' && !prev.find(p => typeof prop !== 'string') ? [prop, ...prev].reverse().join('.') : null;
-    if (keys.has(prop)) {
-      result = keys.get(prop).call(proxy, ...prev);
-    } else if (keyChain && keys.has(keyChain)) {
-      result = keys.get(keyChain).call(proxy, ...prev);
+    const keyFn = findKey(prop, ...prev);
+    if (keyFn) {
+      result = keyFn.call(proxy, ...prev);
     } else {
       result = all.call(proxy, prop, ...prev);
     }
