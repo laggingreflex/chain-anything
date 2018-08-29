@@ -1,9 +1,23 @@
 const chain = require('.');
+const util = require('util');
 const assert = require('assert');
 
 describe('basic', () => {
   it('all', done => chain(ok => done(assert.equal(ok, 'ok'))).ok);
   it('custom', done => chain({ done: () => done() }).done);
+});
+
+describe('opts', () => {
+  it('base', () => {
+    const chained = chain(() => {}, {}, { base: { a: 1 } });
+    assert.equal(util.inspect(chained), '{ a: 1 }')
+    assert.equal(util.inspect(chained.a), '1')
+  });
+  it('inherit', () => {
+    const chained = chain(() => {}, {}, { base: { a: 1 }, inherit: false });
+    assert.equal(util.inspect(chained), '{ a: 1 }')
+    assert.equal(util.inspect(chained.a), '{ a: 1 }')
+  });
 });
 
 describe('full', () => {
@@ -39,3 +53,11 @@ describe('full', () => {
     ]);
   });
 });
+
+describe('misc', () => {
+  it('class', () => {
+    const chained = chain(() => {}, {}, { base: class {} });
+
+    new chained();
+  });
+})

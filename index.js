@@ -21,9 +21,18 @@ module.exports = (all, keys, opts) => {
   if (!opts) {
     throw new Error('Invalid arguments: opts need to be an object');
   }
+  if (!opts.base) {
+    opts.base = {};
+  }
 
-  const createProxy = (from, ...prev) => new Proxy(from, {
-    get: (t, prop) => get(prop, ...prev),
+  const createProxy = (base, ...prev) => new Proxy(base, {
+    get: (t, prop) => {
+      if (opts.inherit !== false) {
+        return prop in t ? t[prop] : get(prop, ...prev)
+      } else {
+        return get(prop, ...prev)
+      }
+    },
   });
 
   let proxy;
@@ -44,16 +53,16 @@ module.exports = (all, keys, opts) => {
         if (result !== undefined) {
           return result;
         } else {
-          return createProxy({}, prop, ...prev)
+          return createProxy(opts.base, prop, ...prev)
         }
       }
       return createProxy(returnFn, prop, ...prev)
     } else {
-      return createProxy({}, prop, ...prev)
+      return createProxy(opts.base, prop, ...prev)
     }
   };
 
-  proxy = createProxy({});
+  proxy = createProxy(opts.base);
 
   return proxy;
 };
