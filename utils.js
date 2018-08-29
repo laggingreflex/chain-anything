@@ -8,5 +8,15 @@ utils.findKey = map => (prop, ...prev) => {
     return map.get(prop);
   } else if (keyChain && map.has(keyChain)) {
     return map.get(keyChain);
+  } else {
+    for (const key of map.keys()) {
+      let regex = key;
+      if (!(regex instanceof RegExp) && regex.startsWith('/') && regex.endsWith('/')) {
+        regex = new RegExp(regex.substr(1, regex.length - 2));
+      }
+      if (regex instanceof RegExp && (regex.test(prop) || regex.test(keyChain))) {
+        return map.get(key);
+      }
+    }
   }
 }

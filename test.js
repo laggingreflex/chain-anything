@@ -61,6 +61,20 @@ describe('full', () => {
     });
     chained.key.chain.a
   });
+  describe('regex', () => {
+    it('map', done => {
+      const chained = chain(new Map([
+        [/a.*c/, () => done()]
+      ]));
+      chained.a.b.c
+    });
+    it('object', done => {
+      const chained = chain({
+        '/a.*c/': () => done()
+      });
+      chained.a.b.c
+    });
+  })
 });
 
 describe('misc', () => {

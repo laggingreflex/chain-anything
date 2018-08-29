@@ -23,7 +23,13 @@ chain(all, {...custom}, {...opts})
 
 * **`all`** `function` that gets called on every property access with all previous properties as args in latest-to-oldest order.
 
-* **`{...custom}`** `object|Map` whose keys (`function`) get called whenever that key is accessed. Keys may also be of the form: `key.chain`.
+* **`{...custom}`** `object|Map` whose keys (`function`) get called whenever that key is accessed.
+
+  Keys may be of the form:
+
+    * single key
+    * `key.chain`
+    * regex
 
 * **`opts.base`** Base to use for proxy.
 
