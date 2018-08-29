@@ -1,6 +1,6 @@
 {
   "name": "chain-free",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Create chains with arbitrary properties using ES Proxy",
   "main": "index.js",
   "scripts": {
