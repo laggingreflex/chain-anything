@@ -1,4 +1,4 @@
-const noop = () => {};
+const utils = require('./utils');
 
 module.exports = (all, keys, opts) => {
   if (!opts) {
@@ -7,7 +7,7 @@ module.exports = (all, keys, opts) => {
       keys = {};
       if (typeof all !== 'function') {
         keys = all;
-        all = noop;
+        all = utils.noop;
       }
     }
   }
