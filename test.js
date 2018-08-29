@@ -3,8 +3,16 @@ const util = require('util');
 const assert = require('assert');
 
 describe('basic', () => {
-  it('all', done => chain(ok => done(assert.equal(ok, 'ok'))).ok);
-  it('custom', done => chain({ done: () => done() }).done);
+  it('all', done => chain((...args) => {
+    assert.deepEqual(args, ['ok']);
+    done();
+  }).ok);
+  it('custom', done => chain({
+    custom: (...args) => {
+      assert.deepEqual(args, ['custom']);
+      done();
+    }
+  }).custom);
 });
 
 describe('opts', () => {
@@ -64,13 +72,19 @@ describe('full', () => {
   describe('regex', () => {
     it('map', done => {
       const chained = chain(new Map([
-        [/a.*c/, () => done()]
+        [/a.*c/, (...args) => {
+          assert.deepEqual(args, ['c', 'b', 'a']);
+          done();
+        }]
       ]));
       chained.a.b.c
     });
     it('object', done => {
       const chained = chain({
-        '/a.*c/': () => done()
+        '/a.*c/': (...args) => {
+          assert.deepEqual(args, ['c', 'b', 'a']);
+          done();
+        }
       });
       chained.a.b.c
     });
@@ -78,8 +92,15 @@ describe('full', () => {
 });
 
 describe('misc', () => {
-  it('class', () => {
-    const chained = chain(() => {}, {}, { base: class {} });
+  it('class', done => {
+    const chained = chain(() => {}, {}, {
+      base: class {
+        constructor(...args) {
+          assert.deepEqual(args, []);
+          done();
+        }
+      }
+    });
     new chained();
   });
 })
