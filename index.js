@@ -50,7 +50,7 @@ module.exports = (all, keys, opts) => {
     let result;
     const keyFn = findKey(prop, ...prev);
     if (keyFn) {
-      result = keyFn.call(proxy, ...prev);
+      result = keyFn.call(proxy, prop, ...prev);
     } else {
       result = all.call(proxy, prop, ...prev);
     }

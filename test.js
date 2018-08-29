@@ -48,7 +48,7 @@ describe('full', () => {
     ]);
 
     assert.deepEqual(custom, [
-      ['g', 'e', 'd', 'b', 'a'],
+      ['custom', 'g', 'e', 'd', 'b', 'a'],
       ['h'],
     ]);
   });
