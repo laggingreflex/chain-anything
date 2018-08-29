@@ -18,6 +18,13 @@ module.exports = (all, keys, opts) => {
   if (!keys) {
     throw new Error('Invalid arguments: keys need to be an object');
   }
+  if (!(keys instanceof Map)) {
+    const map = new Map;
+    for (const key in keys) {
+      map.set(key, keys[key]);
+    }
+    keys = map;
+  }
   if (!opts) {
     throw new Error('Invalid arguments: opts need to be an object');
   }
@@ -40,10 +47,10 @@ module.exports = (all, keys, opts) => {
   const get = (prop, ...prev) => {
     let result;
     let keyChain = typeof prop === 'string' && !prev.find(p => typeof prop !== 'string') ? [prop, ...prev].reverse().join('.') : null;
-    if (prop in keys) {
-      result = keys[prop].call(proxy, ...prev);
-    } else if (keyChain && keyChain in keys) {
-      result = keys[keyChain].call(proxy, ...prev);
+    if (keys.has(prop)) {
+      result = keys.get(prop).call(proxy, ...prev);
+    } else if (keyChain && keys.has(keyChain)) {
+      result = keys.get(keyChain).call(proxy, ...prev);
     } else {
       result = all.call(proxy, prop, ...prev);
     }
