@@ -13,6 +13,13 @@ describe('basic', () => {
       done();
     }
   }).custom);
+  it('set', () => {
+    const chained = chain(() => () => {});
+    chained.a = 1
+    chained.b.b = 2
+    assert.equal(chained.a, 1);
+    assert.equal(chained.b, 2);
+  });
 });
 
 describe('opts', () => {
