@@ -35,6 +35,8 @@ chain(all, {...custom}, {...opts})
 
 * **`opts.inherit`** `[default:true]` Whether to inherit existing  properties.
 
+* **`opts.exclude`** `[default:[inspect]]` Keys to exclude from proxying. For internal properties like `inspect` to prevent infinite loops.
+
 
 ### Example
 

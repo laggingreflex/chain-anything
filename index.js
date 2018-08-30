@@ -31,9 +31,18 @@ module.exports = (all, keys, opts) => {
   if (!opts.base) {
     opts.base = {};
   }
+  if (!opts.exclude) {
+    opts.exclude = ['inspect'];
+  }
+  if (!Array.isArray(opts.exclude)) {
+    throw new Error('Expected `opts.exclude` to be an array');
+  }
 
   const createProxy = (base, ...prev) => new Proxy(base, {
     get: (t, prop) => {
+      if (typeof prop !== 'string' || opts.exclude.includes(prop)) {
+        return opts.base[prop];
+      }
       if (opts.inherit !== false) {
         return prop in t ? t[prop] : get(prop, ...prev)
       } else {
