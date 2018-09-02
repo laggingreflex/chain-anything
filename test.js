@@ -15,10 +15,9 @@ describe('basic', () => {
   }).custom);
   it('set', () => {
     const chained = chain(() => () => {});
-    chained.a = 1
-    chained.b.b = 2
-    assert.equal(chained.a, 1);
-    assert.equal(chained.b, 2);
+    chained.a = 1;
+    chained.b.b = 2;
+    assert.deepEqual(chained, { a: 1, b: { b: 2 } });
   });
 });
 

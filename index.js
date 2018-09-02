@@ -31,15 +31,6 @@ module.exports = (all, keys, opts) => {
   if (!opts.base) {
     opts.base = {};
   }
-  if (!opts.set) {
-    opts.set = (t, prop, value) => {
-      opts.base[prop] = value;
-      return true;
-    };
-  }
-  if (typeof opts.set !== 'function') {
-    throw new Error('Expected `opts.set` to be a function');
-  }
   if (!opts.exclude) {
     opts.exclude = ['inspect'];
   }
@@ -58,7 +49,15 @@ module.exports = (all, keys, opts) => {
         return get(prop, ...prev)
       }
     },
-    set: opts.set,
+    set: (t, prop, value) => {
+      let base = opts.base;
+      for (const prop of Array.from(prev).reverse()) {
+        if (!base[prop]) base[prop] = {};
+        base = base[prop];
+      }
+      base[prop] = value;
+      return true;
+    },
   });
 
   const findKey = utils.findKey(keys);

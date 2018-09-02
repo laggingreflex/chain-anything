@@ -37,9 +37,6 @@ chain(all, {...custom}, {...opts})
 
 * **`opts.exclude`** `[default:[inspect]]` Keys to exclude from proxying. For internal properties like `inspect` to prevent infinite loops.
 
-* **`opts.set`** Setter function to handle assigning values to properties. Default: (when opts.inherit=true) assigns new properties (however deep) to `opts.base`. Note: Since `opts.inherit=true` (which is default) assigning new properties on old ones won't attach them to `opts.base` but instead previously assigned properties.
-
-
 ### Example
 
 ```js
