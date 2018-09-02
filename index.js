@@ -37,6 +37,12 @@ module.exports = (all, keys, opts) => {
   if (!Array.isArray(opts.exclude)) {
     throw new Error('Expected `opts.exclude` to be an array');
   }
+  if (!('depth' in opts)) {
+    opts.depth = Infinity;
+  }
+  if (typeof opts.depth !== 'number') {
+    throw new Error('Expected `opts.depth` to be a number');
+  }
 
   const createProxy = (base, ...prev) => new Proxy(base, {
     get: (t, prop) => {
@@ -80,12 +86,16 @@ module.exports = (all, keys, opts) => {
         const result = fn.call(proxy, ...args);
         if (result !== undefined) {
           return result;
-        } else {
+        } else if (prev.length < opts.depth) {
           return createProxy(opts.base, prop, ...prev)
         }
       }
-      return createProxy(returnFn, prop, ...prev)
-    } else {
+      if (prev.length < opts.depth) {
+        return createProxy(returnFn, prop, ...prev)
+      } else {
+        return returnFn;
+      }
+    } else if (prev.length < opts.depth) {
       return createProxy(opts.base, prop, ...prev)
     }
   };

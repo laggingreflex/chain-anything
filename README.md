@@ -37,6 +37,8 @@ chain(all, {...custom}, {...opts})
 
 * **`opts.exclude`** `[default:[inspect]]` Keys to exclude from proxying. For internal properties like `inspect` to prevent infinite loops.
 
+* **`opts.depth`** `[default:Infinity]` Depth to which properties should be accessible.
+
 ### Example
 
 ```js
